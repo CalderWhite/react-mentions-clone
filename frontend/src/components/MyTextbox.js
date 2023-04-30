@@ -141,7 +141,10 @@ function MyTextbox() {
             const left = value.substring(0, start);
             const right = value.substring(start + newVisibleText[i].len)
             setValue(left + right);
+            console.log(JSON.parse(JSON.stringify(newVisibleText)))
             newVisibleText.splice(i, 1);
+            console.log(JSON.parse(JSON.stringify(newVisibleText)))
+            event.preventDefault();
             break;
           }
         }
@@ -181,6 +184,8 @@ function MyTextbox() {
       // ));
       setActiveSuggestion(0);
     }
+
+    console.log(JSON.parse(JSON.stringify(visibileText)))
   }
 
   const handleKeyDown = (event) => {
@@ -205,8 +210,8 @@ function MyTextbox() {
   }
 
   const handleSuggestionClick = (user) => {
-    setValue(user.name);
-    setShowSuggestions(false);
+    // setValue(user.name);
+    // setShowSuggestions(false);
   }
 
   let suggestionsList;
