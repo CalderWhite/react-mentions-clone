@@ -41,17 +41,14 @@ function MyTextbox() {
           let oldLength = newVisibleText[i].len;
           // update the boxes
           newVisibleText.splice(i, 1, {
-            // start: newVisibleText[i].start,
             len: startIndex-start,
             textType: 'text'
           }) // we do want to delete the original text box, so we put 1
           newVisibleText.splice(i+1, 0, {
-            // start: startIndex,
             len: suggestion.length,
             textType: 'employee'
           });
           newVisibleText.splice(i+2, 0, {
-            // start: startIndex + suggestion.length,
             len: Math.max(oldLength - (startIndex - start) - (selectionStart - startIndex), 0),
             textType: 'text'
           });
