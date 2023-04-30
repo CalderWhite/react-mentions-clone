@@ -33,23 +33,24 @@ function MyTextbox() {
       // we just need to find which one, split it up and insert the suggestion inbetween the two halves.
       let found = false;
       let newVisibleText = visibileText.slice();
+      let start = 0;
       for (let i=0; i<newVisibleText.length; ++i) {
-        if (newVisibleText[i].start <= startIndex && (newVisibleText[i].start + newVisibleText[i].len) >= selectionStart) {
+        if (start <= startIndex && (start + newVisibleText[i].len) >= selectionStart) {
           // technically we don't need to check both conditions, but they should both be true.
 
           // update the boxes
           newVisibleText.splice(i, 1, {
-            start: newVisibleText[i].start,
-            len: (startIndex-newVisibleText[i].start),
+            // start: newVisibleText[i].start,
+            len: (startIndex-start),
             textType: 'text'
           }) // we do want to delete the original text box, so we put 1
           newVisibleText.splice(i+1, 0, {
-            start: startIndex,
+            // start: startIndex,
             len: suggestion.length,
             textType: 'employee'
           });
           newVisibleText.splice(i+2, 0, {
-            start: startIndex + suggestion.length,
+            // start: startIndex + suggestion.length,
             len: Math.max(newVisibleText[i].len - suggestion.length - startIndex, 0),
             textType: 'text'
           });
@@ -64,6 +65,7 @@ function MyTextbox() {
           found = true;
           break;
         }
+        start += newVisibleText[i].len;
       }
 
       if (!found) {
@@ -80,34 +82,35 @@ function MyTextbox() {
   }
 
   const updateBackgroundBoxes = (event) => {
-    const inputValue = event.target.value;
     // subtract one since this is the selection AFTER the character has been typed
     const selectionStart = event.target.selectionStart - 1;
     let newVisibleText = visibileText.slice();
     // find the correct item to update and then update it
+    let start = 0;
     for (let i=0; i<newVisibleText.length; ++i) {
-      if (newVisibleText[i].start <= selectionStart && (newVisibleText[i].start + newVisibleText[i].len) >= selectionStart) {
+      if (start <= selectionStart && (start + newVisibleText[i].len) >= selectionStart) {
         if (newVisibleText[i].textType === 'text') {
           newVisibleText[i].len++;
           // we don't actually need to track the start index in the objects. Next time don't do that.
-          if (i != newVisibleText.length - 1) {
-            newVisibleText[i+1].start++;
-          }
+          // if (i != newVisibleText.length - 1) {
+          //   newVisibleText[i+1].start++;
+          // }
           break;
         } else {
           let insertIndex;
-          if (newVisibleText[i].start == selectionStart) {
+          if (start === selectionStart) {
             insertIndex = i;
-          } else if (newVisibleText[i].start + newVisibleText[i].len == selectionStart) {
+          } else if (start + newVisibleText[i].len === selectionStart) {
             insertIndex = i + 1;
           }
           newVisibleText.splice(insertIndex, 0, {
-            start: selectionStart,
+            // start: selectionStart,
             len: 1,
             textType: 'text'
           })
         }
       }
+      start += newVisibleText[i].len;
     }
 
     // newVisibleText should never be empty
@@ -133,7 +136,8 @@ function MyTextbox() {
     }
   }
 
-  const handleKeyDown = (event) => {    
+  const handleKeyDown = (event) => {
+    console.log(event.keyCode)
     if (event.keyCode === 13) { // enter key
       flushSuggestion(event.target.selectionStart)
     } else if (event.keyCode === 9) { // tab
@@ -149,6 +153,8 @@ function MyTextbox() {
       beginSuggesting(event.target.selectionStart);
     } else if (event.keyCode === 32) { // space (disables special behaviour)
       clearSuggestion();
+    } else if (event.keyCode === 8) {// delete
+      // 
     }
   }
 
@@ -184,12 +190,23 @@ function MyTextbox() {
     }
   }
 
+  const getVisibleTextWithStart = () => {
+    let visibleTextCopy = visibileText.slice();
+    let start = 0;
+    for (let i=0; i<visibleTextCopy.length; ++i) {
+      visibleTextCopy[i].start = start;
+      start += visibleTextCopy[i].len;
+    }
+    return visibleTextCopy;
+  }
+
   return (
     <div className="mentions-parent">
       <>
         <div className="box-text">
           {/* textType: 'customer' | 'employee' | 'text' */}
-          {visibileText.map(({start, len, textType}, index) => {
+          {getVisibleTextWithStart().map(({start, len, textType}, index) => {
+            console.log(start, len)
             const text = value.substring(start, start+len);
             if (textType === 'text') {
               return (<span>{text}</span>)
