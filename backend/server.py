@@ -20,6 +20,8 @@ CORS(app)
 
 
 def run_query(query_text):
+    if query_text == "_":
+        query_text = ""
     out = es.search(
         index="search-names-v3",
         query={

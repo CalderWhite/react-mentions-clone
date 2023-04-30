@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
 
-const users = [
-  { id: 1, name: 'Alice', tag: 'employee' },
-  { id: 2, name: 'Bob', tag: 'customer' },
-  { id: 3, name: 'Charlie', tag: 'employee' },
-  { id: 4, name: 'John', tag: 'customer' },
-];
-
 function MyTextbox() {
   const [value, setValue] = useState('');
   const [startIndex, setStartIndex] = useState(0);
@@ -15,17 +8,25 @@ function MyTextbox() {
 
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
-  const [filteredSuggestions, setFilteredSuggestions] = useState(users);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
   const clearSuggestion = () => {
     setShowSuggestions(false);
     setStartIndex(-1);
+    setFilteredSuggestions([])
     // also empty the suggestion value
   }
 
   const beginSuggesting = (index) => {
     setShowSuggestions(true);
     setStartIndex(index);
+    // query for "_" to query for an empty string.
+    let url = 'http://' + window.location.hostname + ':5000';
+    fetch(url + '/query/_')
+    .then(response => response.json())
+    .then(newData => {
+      setFilteredSuggestions(newData)
+    });
   }
 
   const flushSuggestion = (selectionStart) => {
@@ -228,9 +229,8 @@ function MyTextbox() {
       );
     } else {
       suggestionsList = (
-        <div>
-          No suggestions found.
-        </div>
+        <>
+        </>
       );
     }
   }
