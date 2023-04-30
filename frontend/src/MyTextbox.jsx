@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 
-const users = [  { id: 1, display: 'Alice' },  { id: 2, display: 'Bob' },  { id: 3, display: 'Charlie' },];
+const users = [
+  { id: 1, name: 'Alice', tag: 'employee' },
+  { id: 2, name: 'Bob', tag: 'customer' },
+  { id: 3, name: 'Charlie', tag: 'employee' },
+  { id: 4, name: 'John', tag: 'customer' },
+];
 
 function MyTextbox() {
   const [value, setValue] = useState('');
@@ -26,7 +31,7 @@ function MyTextbox() {
   const flushSuggestion = (selectionStart) => {
     // if there is an existing active suggestion, flush it
     if (filteredSuggestions[activeSuggestion]) {
-      const suggestion = filteredSuggestions[activeSuggestion].display;
+      const suggestion = filteredSuggestions[activeSuggestion].name;
 
       // starts at `startIndex`, ends at `selectionStart`
       // both of these should be within a single text item,
@@ -46,7 +51,7 @@ function MyTextbox() {
           }) // we do want to delete the original text box, so we put 1
           newVisibleText.splice(i+1, 0, {
             len: suggestion.length,
-            textType: 'employee'
+            textType: filteredSuggestions[activeSuggestion].tag
           });
           newVisibleText.splice(i+2, 0, {
             len: Math.max(oldLength - (startIndex - start) - (selectionStart - startIndex), 0),
@@ -159,9 +164,20 @@ function MyTextbox() {
     if (showSuggestions) {
       // must use `inputValue`, otherwise race condition. + 1 to move past the "@" symbol
       const suggestionValue = inputValue.substring(startIndex + 1, event.target.selectionStart);
-      setFilteredSuggestions(users.filter(user =>
-        user.display.toLowerCase().includes(suggestionValue.toLowerCase())
-      ));
+
+      let url = 'http://' + window.location.hostname + ':5000';
+      // if (url.search(".run.app") > -1) {
+      //     url = 'https://network-search-demo-gttbsqlgba-uc.a.run.app';
+      // }
+      fetch(url + '/query/' + encodeURI(suggestionValue.toLowerCase()))
+        .then(response => response.json())
+        .then(newData => {
+          setFilteredSuggestions(newData)
+        });
+
+      // setFilteredSuggestions(users.filter(user =>
+      //   user.name.toLowerCase().includes(suggestionValue.toLowerCase())
+      // ));
       setActiveSuggestion(0);
     }
   }
@@ -188,7 +204,7 @@ function MyTextbox() {
   }
 
   const handleSuggestionClick = (user) => {
-    setValue(user.display);
+    setValue(user.name);
     setShowSuggestions(false);
   }
 
@@ -204,7 +220,7 @@ function MyTextbox() {
             }
             return (
               <li key={user.id} className={className} onClick={() => handleSuggestionClick(user)}>
-                {user.display}
+                {user.name} ({user.tag})
               </li>
             );
           })}
