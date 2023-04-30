@@ -1,3 +1,5 @@
 elastic-transport==8.4.0
 elasticsearch==8.7.0
 openai==0.26.5
+Flask==2.3.1
+Flask-Cors==3.0.10
