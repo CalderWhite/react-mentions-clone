@@ -38,10 +38,11 @@ function MyTextbox() {
         if (start <= startIndex && (start + newVisibleText[i].len) >= selectionStart) {
           // technically we don't need to check both conditions, but they should both be true.
 
+          let oldLength = newVisibleText[i].len;
           // update the boxes
           newVisibleText.splice(i, 1, {
             // start: newVisibleText[i].start,
-            len: (startIndex-start),
+            len: startIndex-start,
             textType: 'text'
           }) // we do want to delete the original text box, so we put 1
           newVisibleText.splice(i+1, 0, {
@@ -51,7 +52,7 @@ function MyTextbox() {
           });
           newVisibleText.splice(i+2, 0, {
             // start: startIndex + suggestion.length,
-            len: Math.max(newVisibleText[i].len - suggestion.length - startIndex, 0),
+            len: Math.max(oldLength - (startIndex - start) - (selectionStart - startIndex), 0),
             textType: 'text'
           });
 
@@ -62,6 +63,7 @@ function MyTextbox() {
           const rightHalf = value.substring(selectionStart);
           setValue(leftHalf + suggestion + rightHalf);
 
+          console.log(newVisibleText)
           found = true;
           break;
         }
@@ -70,7 +72,6 @@ function MyTextbox() {
 
       if (!found) {
         setVisibleText([{
-          start: 0,
           len: suggestion.length,
           textType: 'employee'
         }]);
@@ -124,7 +125,7 @@ function MyTextbox() {
     const inputValue = event.target.value;
     setValue(inputValue);
     updateBackgroundBoxes(event);
-    console.log(inputValue, visibileText)
+    // console.log(inputValue, visibileText)
 
     if (showSuggestions) {
       // must use `inputValue`, otherwise race condition. + 1 to move past the "@" symbol
@@ -137,7 +138,7 @@ function MyTextbox() {
   }
 
   const handleKeyDown = (event) => {
-    console.log(event.keyCode)
+    // console.log(event.keyCode)
     if (event.keyCode === 13) { // enter key
       flushSuggestion(event.target.selectionStart)
     } else if (event.keyCode === 9) { // tab
@@ -206,7 +207,6 @@ function MyTextbox() {
         <div className="box-text">
           {/* textType: 'customer' | 'employee' | 'text' */}
           {getVisibleTextWithStart().map(({start, len, textType}, index) => {
-            console.log(start, len)
             const text = value.substring(start, start+len);
             if (textType === 'text') {
               return (<span>{text}</span>)
