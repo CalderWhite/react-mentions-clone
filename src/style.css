@@ -1,0 +1,38 @@
+.active {
+    background: lightcoral;
+}
+input {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: transparent;
+    overflow: hidden;
+
+    font-size: 1em;
+    font-family: Arial;
+    overflow: hidden;
+    width: 100%;
+}
+.mentions-parent {
+    position: relative;
+    width: 10em;
+}
+.box-text {
+    color: rgba(0, 0, 0, 0);
+    /* Matching the input padding & border */
+    padding: 1px 2px;
+    border: 2px solid rgba(0, 0, 0, 0);
+    font-size: 1em;
+    font-family: Arial;
+    overflow: hidden;
+    width: 100%;
+    white-space: nowrap;
+    white-space: pre;
+}
+
+.employee {
+    background-color: red
+}
+.customer {
+    background-color: blue;
+}
